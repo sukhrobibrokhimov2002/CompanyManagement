@@ -56,7 +56,7 @@ public class UserService {
 
         User users = new User();
         users.setEmail(userDto.getEmail());
-        String randomPassword = passwordGenerator.generateRandomPassword(8);
+        String randomPassword = passwordGenerator.generateRandomPassword(3);
         users.setPassword(passwordEncoder.encode(randomPassword));
         users.setFullName(userDto.getFullName());
 

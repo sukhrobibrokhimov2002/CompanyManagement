@@ -15,6 +15,7 @@ import uz.pdp.lesson5task1.security.JwtProvider;
 
 import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -90,6 +91,17 @@ public class TaskService {
         boolean mailForComplete = mailSender.mailForComplete(byTaskNameAndTaskTaker.getTaskGiver().getEmail(), taskName, byTaskNameAndTaskTaker.getDescription(), byEmail.get().getFullName());
         if (mailForComplete) return new ApiResponse(true, "Successfully completed");
         return new ApiResponse(true, "Emailda xatolik");
+
+    }
+
+    public List<Task> getUserTasks(HttpServletRequest httpServletRequest) {
+        String token = httpServletRequest.getHeader("Authorization");
+        token = token.substring(7);
+        String userNameFromToken = jwtProvider.getUserNameFromToken(token);
+        Optional<User> byEmail = usersRepository.findByEmail(userNameFromToken);
+        if (!byEmail.isPresent()) return null;
+        List<Task> byTaskTaker = taskRepository.findByTaskTaker(byEmail.get());
+        return byTaskTaker;
 
     }
 

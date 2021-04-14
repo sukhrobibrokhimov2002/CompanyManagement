@@ -20,6 +20,11 @@ public class Company {
     private User directorName;
 
 
+    public Company(String companyName, User directorName) {
+        this.companyName = companyName;
+        this.directorName = directorName;
+    }
+
     public Company(User directorName, String companyName) {
         this.directorName = directorName;
         this.companyName = companyName;
