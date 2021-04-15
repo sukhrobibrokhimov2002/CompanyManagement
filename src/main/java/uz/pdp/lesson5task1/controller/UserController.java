@@ -8,6 +8,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import uz.pdp.lesson5task1.entity.User;
 import uz.pdp.lesson5task1.payload.ApiResponse;
+import uz.pdp.lesson5task1.payload.QueryResponseDto;
 import uz.pdp.lesson5task1.payload.UserDto;
 import uz.pdp.lesson5task1.service.UserService;
 
@@ -43,12 +44,14 @@ public class UserController {
 
     }
 
-    @GetMapping("/getUserInfo")
-    public ResponseEntity<?> getUserInfo(HttpServletRequest httpServletRequest) {
-        List<User> userInfo = userService.getUserInfo(httpServletRequest);
+    //direktorlarga manager va ishcilarni, managerlarga esa faqat xodimlarni ro'yhati ko'rinadi
+    @GetMapping("/getUserAllInfo")
+    public ResponseEntity<?> getAllInfo(HttpServletRequest httpServletRequest) {
+        List<User> userInfo = userService.getUserAllInfo(httpServletRequest);
         if (userInfo.isEmpty()) return ResponseEntity.status(409).body(userInfo);
         return ResponseEntity.ok(userInfo);
     }
+
 
     @DeleteMapping("/delete")
     public ResponseEntity<?> deleteUser(HttpServletRequest httpServletRequest) {
@@ -65,6 +68,13 @@ public class UserController {
         return ResponseEntity.status(409).body(apiResponse);
     }
 
+
+    @GetMapping("/getOneUserInfo")
+    public ResponseEntity<?> getOnlyOneUserInfo(@RequestParam String email) {
+        QueryResponseDto oneUserInfo = userService.getOneUserInfo(email);
+
+        return ResponseEntity.ok(oneUserInfo);
+    }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MethodArgumentNotValidException.class)

@@ -8,6 +8,7 @@ import uz.pdp.lesson5task1.entity.Task;
 import uz.pdp.lesson5task1.entity.User;
 import uz.pdp.lesson5task1.entity.enums.TaskStatusEnum;
 import uz.pdp.lesson5task1.payload.ApiResponse;
+import uz.pdp.lesson5task1.payload.QueryResponseDtoForTask;
 import uz.pdp.lesson5task1.payload.TaskDto;
 import uz.pdp.lesson5task1.repository.TaskRepository;
 import uz.pdp.lesson5task1.repository.UsersRepository;
@@ -52,7 +53,7 @@ public class TaskService {
         task.setTaskTaker(taskTaker);
         task.setTaskName(taskDto.getTaskName());
         task.setTaskStatus(TaskStatusEnum.TASK_NOT_STARTED);
-        task.setDeadline(taskDto.getTimestamp());
+        task.setDeadline(taskDto.getDeadline());
         task.setDescription(taskDto.getDescription());
         Task save = taskRepository.save(task);
 
@@ -103,6 +104,16 @@ public class TaskService {
         List<Task> byTaskTaker = taskRepository.findByTaskTaker(byEmail.get());
         return byTaskTaker;
 
+    }
+
+    public List<QueryResponseDtoForTask> getOutdatedTask() {
+        List<QueryResponseDtoForTask> byOutDated = taskRepository.getByOutDated();
+        return byOutDated;
+    }
+
+    public List<QueryResponseDtoForTask> getCompletedTask() {
+        List<QueryResponseDtoForTask> byTaskCompleted = taskRepository.getByTaskCompleted();
+        return byTaskCompleted;
     }
 
 }

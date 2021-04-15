@@ -16,6 +16,7 @@ import uz.pdp.lesson5task1.repository.RoleRepository;
 import uz.pdp.lesson5task1.repository.UsersRepository;
 
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 @Component
@@ -39,11 +40,17 @@ public class DataLoader implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         if (initialMode.equals("always")) {
-            Role role=new Role();
-            role.setName(RoleEnum.ROLE_ADMIN);
+            Optional<Role> byRoleId = roleRepository.findByRoleId(4);
             Set<Role> roles = new HashSet<>();
-            roles.add(role);
-            User user = new User("Sukhrob Ibrokhimov",passwordEncoder.encode("123"),"sukhrobjon2002@gmail.com","Admin of the system",roles,true);
+            roles.add(byRoleId.get());
+            User user = new User();
+            user.setEmail("sukhrobjon0901@gmail.com");
+            user.setFullName("Sukhrob Ibrokhimov");
+            user.setPassword(passwordEncoder.encode("123"));
+            user.setRoles(roles);
+            user.setPosition("Admin of the system");
+            user.setEnabled(true);
+
             User director = userRepository.save(user);
             Company company = new Company("PDP", director);
             Company save = companyRepository.save(company);

@@ -20,9 +20,10 @@ public class SalaryTaken extends AbsEntity {
     private User owner;
     @Column(nullable = false)
     private double amount;
-    @Enumerated(EnumType.STRING)
-    private MonthEnum monthEnum;
+    @ManyToOne
+    private Months months;
 
-    private  boolean paid=false;
+    private boolean paid = false;
 
 }
+

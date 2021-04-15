@@ -10,6 +10,7 @@ import uz.pdp.lesson5task1.entity.Role;
 import uz.pdp.lesson5task1.entity.User;
 import uz.pdp.lesson5task1.entity.enums.RoleEnum;
 import uz.pdp.lesson5task1.payload.ApiResponse;
+import uz.pdp.lesson5task1.payload.QueryResponseDto;
 import uz.pdp.lesson5task1.payload.UserDto;
 import uz.pdp.lesson5task1.repository.RoleRepository;
 import uz.pdp.lesson5task1.repository.UsersRepository;
@@ -80,23 +81,27 @@ public class UserService {
 
 
     public ApiResponse verifyEmail(String email, String code) {
-        Optional<User> userOptional = usersRepository.findByEmail(email);
-        if (!userOptional.isPresent()) return new ApiResponse(false, "Xatolik");
+        try {
+            Optional<User> userOptional = usersRepository.findByEmail(email);
+            if (!userOptional.isPresent()) return new ApiResponse(false, "Xatolik");
 
-        User user = userOptional.get();
-        if (user.getEmail().equals(email) && user.getVerifyPassword().equals(code)) {
-            user.setEnabled(true);
-            user.setVerifyPassword(null);
-            usersRepository.save(user);
+            User user = userOptional.get();
+            if (user.getEmail().equals(email) && user.getVerifyPassword().equals(code)) {
+                user.setEnabled(true);
+                user.setVerifyPassword(null);
+                usersRepository.save(user);
 
-            return new ApiResponse(true, "Email tasdiqlandi");
+                return new ApiResponse(true, "Email tasdiqlandi");
+            }
+
+        } catch (Exception e) {
+            return new ApiResponse(false, "Xatolik");
         }
         return new ApiResponse(false, "Xatolik");
 
-
     }
 
-    public List<User> getUserInfo(HttpServletRequest httpServletRequest) {
+    public List<User> getUserAllInfo(HttpServletRequest httpServletRequest) {
         String token = httpServletRequest.getHeader("Authorization");
         token = token.substring(7);
         String userNameFromToken = jwtProvider.getUserNameFromToken(token);
@@ -188,4 +193,13 @@ public class UserService {
         return new ApiResponse(false, "Xatolik");
 
     }
+
+    public QueryResponseDto getOneUserInfo(String email) {
+        boolean existsByEmail = usersRepository.existsByEmail(email);
+        if (!existsByEmail) return null;
+        QueryResponseDto userWithTasks = usersRepository.findUserWithTasks(email);
+        return userWithTasks;
+
+    }
+
 }

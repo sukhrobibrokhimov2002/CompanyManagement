@@ -18,7 +18,7 @@ import java.util.UUID;
 
 @NoArgsConstructor
 @Entity
-public class TurniketHistory {
+public class TurnikitHistory {
     @Id
     @GeneratedValue(generator = "uuid2")
     @GenericGenerator(name = "uuid2",strategy = "org.hibernate.id.UUIDGenerator")

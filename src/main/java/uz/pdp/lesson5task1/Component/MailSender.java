@@ -62,12 +62,27 @@ public class MailSender {
     public boolean mailForComplete(String email, String taskName, String taskDescription, String taskTaker) throws MessagingException {
         String link = "http:localhost:8080/task/completeTask?taskName=" + taskName;
         String text =
-                "<a href=\"" + link + "\" style=\"padding: 10px 15px; background-color: darkslateblue; color: white; text-decoration: none; border-radius: 4px; margin: 10px; display: flex; max-width: 120px;\">Vazifani boshlaganliginggizni tasdiqlang</a>\n" +
+                "<a href=\"" + link + "\" style=\"padding: 10px 15px; background-color: darkslateblue; color: white; text-decoration: none; border-radius: 4px; margin: 10px; display: flex; max-width: 120px;\">Maosh kelib tushganligini tasdiqlang</a>\n" +
                         "<br>\n" +
                         "<p> <b> "+taskTaker+"Xodim vazifani a'lo darajada bajardi </b></p>\n" +
                         "<p>Vazifa nomi: <b> " + taskName + "</b></p>\n" +
                         "<p>Vazifa izohi: <b> " + taskDescription + "</b></p>\n" +
                         "<p>Vazifa Bajaruvchi: <b> " + taskTaker + "</b></p>\n" +
+                        "<br>\n" +
+                        "<p style=\"color: red\"><b>Omad yor bo'lsin!</b></p>";
+
+
+        return send(email, text);
+    }
+    public boolean mailForConfirmSalary(String email, double amount,String month) throws MessagingException {
+        String link = "http:localhost:8080/salary/confirmSalary?email=" + email+"&month="+month;
+        String text =
+                "<a href=\"" + link + "\" style=\"padding: 10px 15px; background-color: darkslateblue; color: white; text-decoration: none; border-radius: 4px; margin: 10px; display: flex; max-width: 120px;\">Vazifani boshlaganliginggizni tasdiqlang</a>\n" +
+                        "<br>\n" +
+                        "<p> <b> "+"Sizga oylik maosh berildi tasdiqlang </b></p>\n" +
+                        "<p>Maosh miqdori: <b> " + amount + "</b></p>\n" +
+                        "<p>Qabul qiluvchi email manzii: <b> " + email + "</b></p>\n" +
+                        "<p>Qaysi oy maoshi: <b> " +month + "</b></p>\n" +
                         "<br>\n" +
                         "<p style=\"color: red\"><b>Omad yor bo'lsin!</b></p>";
 

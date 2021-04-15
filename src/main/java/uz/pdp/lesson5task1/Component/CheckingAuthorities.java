@@ -99,4 +99,38 @@ public class CheckingAuthorities {
 
     }
 
+    public boolean checkAuthorityforTurniket(HttpServletRequest httpServletRequest, User turniketOwner) {
+        String token = httpServletRequest.getHeader("Authorization");
+        token = token.substring(7);
+        String userNameFromToken = jwtProvider.getUserNameFromToken(token);
+        Optional<User> byEmail = usersRepository.findByEmail(userNameFromToken);
+        Set<Role> giverRoles = byEmail.get().getRoles();
+
+        int giverRolesStatus = 0;
+        for (Role giverRole : giverRoles) {
+            String giverRoleName = giverRole.getName().name();
+            if (giverRoleName.equals(RoleEnum.ROLE_DIRECTOR.name())) {
+                giverRolesStatus = 1;
+            }
+            if (giverRoleName.equals(RoleEnum.ROLE_MANAGER.name())) {
+                giverRolesStatus = 2;
+            }
+            if (giverRoleName.equals(RoleEnum.ROLE_WORKER.name())) {
+                giverRolesStatus = 3;
+            }
+        }
+
+
+        Set<Role> ownerRoles = turniketOwner.getRoles();
+
+        for (Role roleName : ownerRoles) {
+            String ownerRoleName = roleName.getName().name();
+            if (ownerRoleName.equals(RoleEnum.ROLE_WORKER.name())
+                    && (giverRolesStatus == 1 || giverRolesStatus == 2)) return true;
+        }
+        return false;
+
+
+    }
+
 }

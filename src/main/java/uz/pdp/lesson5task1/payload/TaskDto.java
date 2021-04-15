@@ -20,7 +20,7 @@ public class TaskDto {
     @NotNull(message = "Description of the task must not be null")
     private String description;
 
-    private Timestamp timestamp;
+    private Timestamp deadline;
     private String taskTakerEmail;
 
 
