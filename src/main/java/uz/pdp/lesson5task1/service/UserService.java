@@ -1,6 +1,7 @@
 package uz.pdp.lesson5task1.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import uz.pdp.lesson5task1.Component.CheckingAuthorities;
@@ -39,11 +40,10 @@ public class UserService {
     @Autowired
     PasswordEncoder passwordEncoder;
 
-    public ApiResponse add(HttpServletRequest httpServletRequest, UserDto userDto) throws MessagingException {
-        String token = httpServletRequest.getHeader("Authorization");
-        token = token.substring(7);
-        String userNameFromToken = jwtProvider.getUserNameFromToken(token);
-        Optional<User> userOptional = usersRepository.findByEmail(userNameFromToken);
+    public ApiResponse add(UserDto userDto) throws MessagingException {
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        Optional<User> userOptional = usersRepository.findById(user.getId());
 
         boolean existsByEmail = usersRepository.existsByEmail(userDto.getEmail());
         if (existsByEmail)
@@ -52,7 +52,7 @@ public class UserService {
         Optional<Role> optionalRole = roleRepository.findByRoleId(userDto.getRoleId());
         if (!optionalRole.isPresent()) return new ApiResponse(false, "role not found");
 
-        boolean checkAuthority = checkingAuthorities.checkAuthority(httpServletRequest, optionalRole.get().getName().name());
+        boolean checkAuthority = checkingAuthorities.checkAuthority( optionalRole.get().getName().name());
         if (!checkAuthority) return new ApiResponse(false, "You have not got right for doing this");
 
         User users = new User();
@@ -101,11 +101,10 @@ public class UserService {
 
     }
 
-    public List<User> getUserAllInfo(HttpServletRequest httpServletRequest) {
-        String token = httpServletRequest.getHeader("Authorization");
-        token = token.substring(7);
-        String userNameFromToken = jwtProvider.getUserNameFromToken(token);
-        Optional<User> optionalUser = usersRepository.findByEmail(userNameFromToken);
+    public List<User> getUserAllInfo() {
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        Optional<User> optionalUser = usersRepository.findById(user.getId());
         if (!optionalUser.isPresent()) return null;
 
         Set<Role> roles = optionalUser.get().getRoles();
@@ -144,33 +143,31 @@ public class UserService {
             List<User> forManager = usersRepository.findForManager();
             return forManager;
         } else if (userRoles == 3) {
-            Optional<User> byEmail = usersRepository.findByEmail(userNameFromToken);
+            Optional<User> byEmail = usersRepository.findById(user.getId());
             if (!byEmail.isPresent()) return null;
             return Collections.singletonList(byEmail.get());
         }
         return null;
     }
 
-    public ApiResponse deleteUser(HttpServletRequest httpServletRequest) {
-        String token = httpServletRequest.getHeader("Authorization");
-        token = token.substring(7);
-        String userNameFromToken = jwtProvider.getUserNameFromToken(token);
-        Optional<User> userOptional = usersRepository.findByEmail(userNameFromToken);
+    public ApiResponse deleteUser() {
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        Optional<User> userOptional = usersRepository.findById(user.getId());
         if (!userOptional.isPresent()) return new ApiResponse(false, "User not found");
         usersRepository.deleteById(userOptional.get().getId());
         return new ApiResponse(true, "Successfully deleted");
     }
 
-    public ApiResponse editUser(HttpServletRequest httpServletRequest, UserDto userDto) throws MessagingException {
-        String token = httpServletRequest.getHeader("Authorization");
-        token = token.substring(7);
-        String userNameFromToken = jwtProvider.getUserNameFromToken(token);
-        Optional<User> optionalUser = usersRepository.findByEmail(userNameFromToken);
+    public ApiResponse editUser( UserDto userDto) throws MessagingException {
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        Optional<User> optionalUser = usersRepository.findById(user.getId());
         if (!optionalUser.isPresent()) return new ApiResponse(false, "User not found");
         Optional<Role> optionalRole = roleRepository.findByRoleId(userDto.getRoleId());
         if (!optionalRole.isPresent()) return new ApiResponse(false, "Role not found");
 
-        User user = optionalUser.get();
+        User user1 = optionalUser.get();
         boolean existsByEmailAndIdNot = usersRepository.existsByEmailAndIdNot(userDto.getEmail(), user.getId());
         if (existsByEmailAndIdNot) return new ApiResponse(false, "Bunday email mavjud");
 

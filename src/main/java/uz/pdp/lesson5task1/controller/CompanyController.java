@@ -33,22 +33,22 @@ public class CompanyController {
     }
 
     @GetMapping("/getByToken")
-    public ResponseEntity<?> getByToken(HttpServletRequest httpServletRequest) {
-        Company companyInfoByToken = companyService.getCompanyInfoByToken(httpServletRequest);
+    public ResponseEntity<?> getByToken() {
+        Company companyInfoByToken = companyService.getCompanyInfoByToken();
         if (companyInfoByToken != null) return ResponseEntity.ok(companyInfoByToken);
         return ResponseEntity.status(409).body(companyInfoByToken);
     }
 
     @DeleteMapping
-    public ResponseEntity<?> delete(HttpServletRequest httpServletRequest) {
-        ApiResponse delete = companyService.delete(httpServletRequest);
+    public ResponseEntity<?> delete() {
+        ApiResponse delete = companyService.delete();
         if (!delete.isSuccess()) return ResponseEntity.status(409).body(delete);
         return ResponseEntity.ok(delete);
     }
 
     @PutMapping
-    public ResponseEntity<?> edit(HttpServletRequest httpServletRequest, @RequestBody CompanyDto companyDto) {
-        ApiResponse apiResponse = companyService.edit(httpServletRequest, companyDto);
+    public ResponseEntity<?> edit( @RequestBody CompanyDto companyDto) {
+        ApiResponse apiResponse = companyService.edit(companyDto);
         if (apiResponse.isSuccess()) return ResponseEntity.ok(apiResponse);
         return ResponseEntity.status(409).body(apiResponse);
     }

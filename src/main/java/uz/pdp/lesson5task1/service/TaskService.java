@@ -1,6 +1,7 @@
 package uz.pdp.lesson5task1.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import uz.pdp.lesson5task1.Component.CheckingAuthorities;
 import uz.pdp.lesson5task1.Component.MailSender;
@@ -34,11 +35,10 @@ public class TaskService {
     TaskRepository taskRepository;
 
 
-    public ApiResponse giveTask(HttpServletRequest httpServletRequest, TaskDto taskDto) throws MessagingException {
-        String token = httpServletRequest.getHeader("Authorization");
-        token = token.substring(7);
-        String userNameFromToken = jwtProvider.getUserNameFromToken(token);
-        Optional<User> optionalUser = usersRepository.findByEmail(userNameFromToken);
+    public ApiResponse giveTask(TaskDto taskDto) throws MessagingException {
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        Optional<User> optionalUser = usersRepository.findById(user.getId());
         if (!optionalUser.isPresent()) return new ApiResponse(false, "Task giver not found");
         User taskGiver = optionalUser.get();
 
@@ -46,7 +46,7 @@ public class TaskService {
         if (!taskTakerOptional.isPresent()) return new ApiResponse(false, "Task taker not found");
         User taskTaker = taskTakerOptional.get();
 
-        boolean checkAuthorityForTask = checkingAuthorities.checkAuthorityForTask(httpServletRequest, taskTaker);
+        boolean checkAuthorityForTask = checkingAuthorities.checkAuthorityForTask(taskTaker);
         if (!checkAuthorityForTask) return new ApiResponse(false, "You have not got right for giving task this person");
         Task task = new Task();
         task.setTaskGiver(taskGiver);
@@ -79,11 +79,10 @@ public class TaskService {
         return new ApiResponse(false, "Xatolik");
     }
 
-    public ApiResponse taskCompleted(HttpServletRequest httpServletRequest, String taskName) throws MessagingException {
-        String token = httpServletRequest.getHeader("Authorization");
-        token = token.substring(7);
-        String userNameFromToken = jwtProvider.getUserNameFromToken(token);
-        Optional<User> byEmail = usersRepository.findByEmail(userNameFromToken);
+    public ApiResponse taskCompleted(String taskName) throws MessagingException {
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        Optional<User> byEmail = usersRepository.findById(user.getId());
         if (!byEmail.isPresent()) return new ApiResponse(false, "NOt found");
         Task byTaskNameAndTaskTaker = taskRepository.findByTaskNameAndTaskTaker(taskName, byEmail.get());
         if (byTaskNameAndTaskTaker == null) return new ApiResponse(false, "Task not found");
@@ -95,11 +94,10 @@ public class TaskService {
 
     }
 
-    public List<Task> getUserTasks(HttpServletRequest httpServletRequest) {
-        String token = httpServletRequest.getHeader("Authorization");
-        token = token.substring(7);
-        String userNameFromToken = jwtProvider.getUserNameFromToken(token);
-        Optional<User> byEmail = usersRepository.findByEmail(userNameFromToken);
+    public List<Task> getUserTasks() {
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        Optional<User> byEmail = usersRepository.findById(user.getId());
         if (!byEmail.isPresent()) return null;
         List<Task> byTaskTaker = taskRepository.findByTaskTaker(byEmail.get());
         return byTaskTaker;

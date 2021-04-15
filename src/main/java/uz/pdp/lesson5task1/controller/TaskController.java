@@ -27,8 +27,8 @@ public class TaskController {
 
 
     @PostMapping
-    public ResponseEntity<?> giveTask(HttpServletRequest httpServletRequest, @Valid @RequestBody TaskDto taskDto) throws MessagingException {
-        ApiResponse apiResponse = taskService.giveTask(httpServletRequest, taskDto);
+    public ResponseEntity<?> giveTask( @Valid @RequestBody TaskDto taskDto) throws MessagingException {
+        ApiResponse apiResponse = taskService.giveTask( taskDto);
         if (apiResponse.isSuccess()) return ResponseEntity.ok(apiResponse);
         return ResponseEntity.status(409).body(apiResponse);
     }
@@ -42,15 +42,15 @@ public class TaskController {
     }
 
     @GetMapping("/completeTask")
-    public ResponseEntity<?> completeTask(HttpServletRequest httpServletRequest, @RequestParam String taskName) throws MessagingException {
-        ApiResponse apiResponse = taskService.taskCompleted(httpServletRequest, taskName);
+    public ResponseEntity<?> completeTask( @RequestParam String taskName) throws MessagingException {
+        ApiResponse apiResponse = taskService.taskCompleted( taskName);
         if (apiResponse.isSuccess()) return ResponseEntity.ok(apiResponse);
         return ResponseEntity.status(409).body(apiResponse);
     }
 
     @GetMapping("/getUserTaskInfo")
-    public ResponseEntity<?> getUserTaskInfo(HttpServletRequest httpServletRequest) {
-        List<Task> userTasks = taskService.getUserTasks(httpServletRequest);
+    public ResponseEntity<?> getUserTaskInfo() {
+        List<Task> userTasks = taskService.getUserTasks();
         if (userTasks.isEmpty()) return ResponseEntity.status(409).body(userTasks);
         return ResponseEntity.ok(userTasks);
 

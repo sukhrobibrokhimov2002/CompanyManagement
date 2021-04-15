@@ -1,6 +1,7 @@
 package uz.pdp.lesson5task1.Component;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import uz.pdp.lesson5task1.entity.Role;
@@ -21,12 +22,9 @@ public class CheckingAuthorities {
     @Autowired
     UsersRepository usersRepository;
 
-    public boolean checkAuthority(HttpServletRequest httpServletRequest, String role) {
-        String token = httpServletRequest.getHeader("Authorization");
-        token = token.substring(7);
-
-        String userNameFromToken = jwtProvider.getUserNameFromToken(token);
-        Optional<User> userOptional = usersRepository.findByEmail(userNameFromToken);
+    public boolean checkAuthority(String role) {
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Optional<User> userOptional = usersRepository.findById(user.getId());
 
         if (!userOptional.isPresent()) return false;
 
@@ -63,11 +61,10 @@ public class CheckingAuthorities {
 
     }
 
-    public boolean checkAuthorityForTask(HttpServletRequest httpServletRequest, User taskTaker) {
-        String token = httpServletRequest.getHeader("Authorization");
-        token = token.substring(7);
-        String userNameFromToken = jwtProvider.getUserNameFromToken(token);
-        Optional<User> taskGiver = usersRepository.findByEmail(userNameFromToken);
+    public boolean checkAuthorityForTask(User taskTaker) {
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        Optional<User> taskGiver = usersRepository.findById(user.getId());
         if (!taskGiver.isPresent()) return false;
         int taskGiverRole = 0;  //Task beruvchi rolini aniqlab olish uchun
 
@@ -99,11 +96,11 @@ public class CheckingAuthorities {
 
     }
 
-    public boolean checkAuthorityforTurniket(HttpServletRequest httpServletRequest, User turniketOwner) {
-        String token = httpServletRequest.getHeader("Authorization");
-        token = token.substring(7);
-        String userNameFromToken = jwtProvider.getUserNameFromToken(token);
-        Optional<User> byEmail = usersRepository.findByEmail(userNameFromToken);
+    public boolean checkAuthorityforTurniket(User turniketOwner) {
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+
+        Optional<User> byEmail = usersRepository.findById(user.getId());
         Set<Role> giverRoles = byEmail.get().getRoles();
 
         int giverRolesStatus = 0;

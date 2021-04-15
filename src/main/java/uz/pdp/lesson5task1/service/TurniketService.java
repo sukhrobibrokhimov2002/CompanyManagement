@@ -1,6 +1,7 @@
 package uz.pdp.lesson5task1.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import uz.pdp.lesson5task1.Component.CheckingAuthorities;
 import uz.pdp.lesson5task1.entity.*;
@@ -33,11 +34,10 @@ public class TurniketService {
     @Autowired
     TurniketHistoryRepository turniketHistoryRepository;
 
-    public ApiResponse addTurniket(HttpServletRequest httpServletRequest, TurniketDto turniketDto) {
-        String token = httpServletRequest.getHeader("Authorization");
-        token = token.substring(7);
-        String userNameFromToken = jwtProvider.getUserNameFromToken(token);
-        Optional<User> userOptional = usersRepository.findByEmail(userNameFromToken);
+    public ApiResponse addTurniket( TurniketDto turniketDto) {
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        Optional<User> userOptional = usersRepository.findById(user.getId());
         if (!userOptional.isPresent()) return new ApiResponse(false, "Turniket giver not found");
         User turniketGiver = userOptional.get();
 
@@ -51,7 +51,7 @@ public class TurniketService {
         if (existsByOwner) return new ApiResponse(false, "BU xodimda turnikit mavjud");
 
 
-        boolean checkAuthorityforTurniket = checkingAuthorities.checkAuthorityforTurniket(httpServletRequest, turniketOwner);
+        boolean checkAuthorityforTurniket = checkingAuthorities.checkAuthorityforTurniket( turniketOwner);
         if (!checkAuthorityforTurniket) return new ApiResponse(false, "You have not such a right");
 
         Optional<Company> optionalCompany = companyRepository.findById(turniketDto.getCompanyId());
@@ -67,12 +67,10 @@ public class TurniketService {
 
     }
 
-    public ApiResponse enterExit(HttpServletRequest httpServletRequest) {
-        String token = httpServletRequest.getHeader("Authorization");
-        token = token.substring(7);
-        String userNameFromToken = jwtProvider.getUserNameFromToken(token);
+    public ApiResponse enterExit() {
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-        Optional<User> optionalUser = usersRepository.findByEmail(userNameFromToken);
+        Optional<User> optionalUser = usersRepository.findById(user.getId());
         if (!optionalUser.isPresent()) return new ApiResponse(false, "User not found");
         User owner = optionalUser.get();
 
@@ -104,13 +102,12 @@ public class TurniketService {
 
     }
 
-    public ApiResponse delete(HttpServletRequest httpServletRequest, String uniqueNumber) {
+    public ApiResponse delete(String uniqueNumber) {
 
         try {
-            String token = httpServletRequest.getHeader("Authorization");
-            token = token.substring(7);
-            String userNameFromToken = jwtProvider.getUserNameFromToken(token);
-            Optional<User> optionalUser = usersRepository.findByEmail(userNameFromToken);
+            User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+            Optional<User> optionalUser = usersRepository.findById(user.getId());
             User deleter = optionalUser.get();
             Set<Role> roles = deleter.getRoles();
             int deleterRoleStatus = 0;
@@ -138,11 +135,10 @@ public class TurniketService {
         }
     }
 
-    public Turnikit getTurniketInfo(HttpServletRequest httpServletRequest) {
-        String token = httpServletRequest.getHeader("Authorization");
-        token = token.substring(7);
-        String userNameFromToken = jwtProvider.getUserNameFromToken(token);
-        Optional<User> optionalUser = usersRepository.findByEmail(userNameFromToken);
+    public Turnikit getTurniketInfo() {
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        Optional<User> optionalUser = usersRepository.findById(user.getId());
         Turnikit byOwner = turniketRepository.findByOwner(optionalUser.get());
         return byOwner;
 

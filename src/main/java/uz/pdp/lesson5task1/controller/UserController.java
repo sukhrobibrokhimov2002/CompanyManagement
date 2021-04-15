@@ -28,9 +28,9 @@ public class UserController {
     UserService userService;
 
     @PostMapping("/add")
-    public ResponseEntity<?> add(@Valid @RequestBody UserDto userDto, HttpServletRequest httpServletRequest) throws MessagingException {
+    public ResponseEntity<?> add(@Valid @RequestBody UserDto userDto) throws MessagingException {
 
-        ApiResponse apiResponse = userService.add(httpServletRequest, userDto);
+        ApiResponse apiResponse = userService.add( userDto);
         if (apiResponse.isSuccess()) return ResponseEntity.ok(apiResponse);
         return ResponseEntity.status(409).body(apiResponse);
     }
@@ -46,24 +46,24 @@ public class UserController {
 
     //direktorlarga manager va ishcilarni, managerlarga esa faqat xodimlarni ro'yhati ko'rinadi
     @GetMapping("/getUserAllInfo")
-    public ResponseEntity<?> getAllInfo(HttpServletRequest httpServletRequest) {
-        List<User> userInfo = userService.getUserAllInfo(httpServletRequest);
+    public ResponseEntity<?> getAllInfo() {
+        List<User> userInfo = userService.getUserAllInfo();
         if (userInfo.isEmpty()) return ResponseEntity.status(409).body(userInfo);
         return ResponseEntity.ok(userInfo);
     }
 
 
     @DeleteMapping("/delete")
-    public ResponseEntity<?> deleteUser(HttpServletRequest httpServletRequest) {
-        ApiResponse apiResponse = userService.deleteUser(httpServletRequest);
+    public ResponseEntity<?> deleteUser() {
+        ApiResponse apiResponse = userService.deleteUser();
         if (apiResponse.isSuccess()) return ResponseEntity.ok(apiResponse);
         return ResponseEntity.status(409).body(apiResponse);
     }
 
     @PatchMapping("edit")
-    public ResponseEntity<?> editUserInfo(HttpServletRequest httpServletRequest, @Valid @RequestBody UserDto userDto) throws MessagingException {
+    public ResponseEntity<?> editUserInfo( @Valid @RequestBody UserDto userDto) throws MessagingException {
 
-        ApiResponse apiResponse = userService.editUser(httpServletRequest, userDto);
+        ApiResponse apiResponse = userService.editUser( userDto);
         if (apiResponse.isSuccess()) return ResponseEntity.ok(apiResponse);
         return ResponseEntity.status(409).body(apiResponse);
     }

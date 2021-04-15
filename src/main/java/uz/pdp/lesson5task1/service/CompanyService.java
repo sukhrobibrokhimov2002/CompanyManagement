@@ -1,6 +1,7 @@
 package uz.pdp.lesson5task1.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import uz.pdp.lesson5task1.entity.Company;
 import uz.pdp.lesson5task1.entity.User;
@@ -39,22 +40,20 @@ public class CompanyService {
         return all;
     }
 
-    public Company getCompanyInfoByToken(HttpServletRequest httpServletRequest) {
-        String token = httpServletRequest.getHeader("Authorization");
-        token = token.substring(7);
-        String userNameFromToken = jwtProvider.getUserNameFromToken(token);
-        Optional<User> byEmail = usersRepository.findByEmail(userNameFromToken);
+    public Company getCompanyInfoByToken() {
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        Optional<User> byEmail = usersRepository.findById(user.getId());
         if (!byEmail.isPresent()) return null;
-        User user = byEmail.get();
+        User user2 = byEmail.get();
         Company byDirector = companyRepository.findByDirectorName(user);
         return byDirector;
     }
 
-    public ApiResponse edit(HttpServletRequest httpServletRequest, CompanyDto companyDto) {
-        String token = httpServletRequest.getHeader("Authorization");
-        token = token.substring(7);
-        String userNameFromToken = jwtProvider.getUserNameFromToken(token);
-        Optional<User> byEmail = usersRepository.findByEmail(userNameFromToken);
+    public ApiResponse edit(CompanyDto companyDto) {
+        User user1 = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        Optional<User> byEmail = usersRepository.findById(user1.getId());
         if (!byEmail.isPresent()) return null;
         User user = byEmail.get();
         Company byDirector = companyRepository.findByDirectorName(user);
@@ -69,11 +68,10 @@ public class CompanyService {
     }
 
 
-    public ApiResponse delete(HttpServletRequest httpServletRequest) {
-        String token = httpServletRequest.getHeader("Authorization");
-        token = token.substring(7);
-        String userNameFromToken = jwtProvider.getUserNameFromToken(token);
-        Optional<User> byEmail = usersRepository.findByEmail(userNameFromToken);
+    public ApiResponse delete() {
+        User userFromSystem = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        Optional<User> byEmail = usersRepository.findById(userFromSystem.getId());
         if (!byEmail.isPresent()) return null;
         User user = byEmail.get();
         Company byDirector = companyRepository.findByDirectorName(user);

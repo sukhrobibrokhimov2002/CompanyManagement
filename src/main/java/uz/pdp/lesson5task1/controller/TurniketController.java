@@ -18,29 +18,29 @@ public class TurniketController {
     TurniketService turniketService;
 
     @PostMapping
-    public ResponseEntity<?> giveTurnikit(HttpServletRequest httpServletRequest, @RequestBody TurniketDto turniketDto) {
-        ApiResponse apiResponse = turniketService.addTurniket(httpServletRequest, turniketDto);
+    public ResponseEntity<?> giveTurnikit( @RequestBody TurniketDto turniketDto) {
+        ApiResponse apiResponse = turniketService.addTurniket( turniketDto);
         if (apiResponse.isSuccess()) return ResponseEntity.ok(apiResponse);
         return ResponseEntity.status(409).body(apiResponse);
     }
 
     @GetMapping("/inOut")
-    public ResponseEntity<?> enterAndExit(HttpServletRequest httpServletRequest) {
-        ApiResponse apiResponse = turniketService.enterExit(httpServletRequest);
+    public ResponseEntity<?> enterAndExit() {
+        ApiResponse apiResponse = turniketService.enterExit();
         if (apiResponse.isSuccess()) return ResponseEntity.ok(apiResponse);
         return ResponseEntity.status(409).body(apiResponse);
     }
 
     @DeleteMapping("/delete")
-    public ResponseEntity<?> delete(HttpServletRequest httpServletRequest, @RequestParam String uniqueNumber) {
-        ApiResponse delete = turniketService.delete(httpServletRequest, uniqueNumber);
+    public ResponseEntity<?> delete( @RequestParam String uniqueNumber) {
+        ApiResponse delete = turniketService.delete( uniqueNumber);
         if (delete.isSuccess()) return ResponseEntity.ok(delete);
         return ResponseEntity.status(409).body(delete);
     }
 
     @GetMapping("/getInfo")
-    public ResponseEntity<?> getInfo(HttpServletRequest httpServletRequest) {
-        Turnikit turniketInfo = turniketService.getTurniketInfo(httpServletRequest);
+    public ResponseEntity<?> getInfo() {
+        Turnikit turniketInfo = turniketService.getTurniketInfo();
         if (turniketInfo != null) return ResponseEntity.status(409).body(turniketInfo);
         return ResponseEntity.ok(turniketInfo);
     }
